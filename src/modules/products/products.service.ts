@@ -11,7 +11,6 @@ export class ProductsService {
 
   async getCompanyProducts(companyId: string): Promise<Product[]> {
     try {
-      console.log(mongoose.Types.ObjectId.isValid(companyId));
       const productForCompany = await this.productModel.find({
         company: companyId,
       });
