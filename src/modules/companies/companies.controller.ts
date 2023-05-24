@@ -12,6 +12,7 @@ export class CompaniesController {
   @ApiResponse({
     status: 200,
     description: 'You get a list of companies',
+    type: Company,
   })
   @Get()
   async getAllCompanies(): Promise<Company[]> {
