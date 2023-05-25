@@ -19,6 +19,7 @@ async function bootstrap() {
   const port = configService.get('PORT');
 
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('Multi Store API')
