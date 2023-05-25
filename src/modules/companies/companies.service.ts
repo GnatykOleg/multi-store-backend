@@ -1,6 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
+
 import { InjectModel } from '@nestjs/mongoose';
+
 import { Model } from 'mongoose';
+
 import { Company } from './companies.schema';
 
 @Injectable()
@@ -15,7 +18,7 @@ export class CompaniesService {
 
       return companies;
     } catch (error) {
-      throw new HttpException(error, error.status);
+      throw new HttpException(error.message, error.status);
     }
   }
 }

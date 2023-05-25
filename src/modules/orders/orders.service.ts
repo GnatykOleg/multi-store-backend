@@ -1,10 +1,16 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
+
 import { Model } from 'mongoose';
 
 import { Order } from './orders.schema';
+
 import { OrderDTO } from './orders.dto';
+
+import { ERROR_MESSAGES } from 'src/helpers/constants/constants';
+
+const { ORDERS_HISTORY_NOT_FOUND } = ERROR_MESSAGES;
 
 @Injectable()
 export class OrdersService {
@@ -14,14 +20,12 @@ export class OrdersService {
     try {
       const customerOrders = await this.orderModel.find({ email, phone });
 
-      if (!customerOrders)
-        throw new NotFoundException(
-          'We dont find orders history for this user',
-        );
+      if (customerOrders.length === 0)
+        throw new NotFoundException(ORDERS_HISTORY_NOT_FOUND);
 
       return customerOrders;
     } catch (error) {
-      throw new HttpException(error, error.status);
+      throw new HttpException(error.message, error.status);
     }
   }
 
@@ -31,7 +35,7 @@ export class OrdersService {
 
       return createOrderInDB;
     } catch (error) {
-      throw new HttpException(error, error.status);
+      throw new HttpException(error.message, error.status);
     }
   }
 }

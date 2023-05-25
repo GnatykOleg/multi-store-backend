@@ -8,60 +8,62 @@ import {
   IsNumber,
   IsArray,
   ArrayNotEmpty,
+  ValidateNested,
 } from 'class-validator';
+
+import { Type } from 'class-transformer';
 
 import { Product } from '../products/products.schema';
 
+import { ProductDTO } from '../products/products.dto';
+
+import { ERROR_MESSAGES, EXAMPLES } from 'src/helpers/constants/constants';
+
+const {
+  CUSTOMER_NAME,
+  CUSTOMER_EMAIL,
+  CUSTOMER_PHONE,
+  CUSTOMER_ADRESS,
+  ORDER_TOTAL_PRICE,
+} = EXAMPLES;
+
+const { INVALID_PHONE } = ERROR_MESSAGES;
+
 export class OrderDTO {
-  @ApiProperty({ example: 'John', description: 'Customer name' })
+  @ApiProperty({ example: CUSTOMER_NAME })
   @IsString()
   @IsNotEmpty()
   readonly name: string;
 
-  @ApiProperty({ example: 'john@mail.com', description: 'Customer email' })
+  @ApiProperty({ example: CUSTOMER_EMAIL })
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
 
-  @ApiProperty({
-    example: '380459996658',
-    description: 'Customer phone for Ukraine without +',
-  })
-  @Matches(/^380\d{9}$/, {
-    message: 'The phone number must be 12 digits, without the "+" symbol.',
-  })
+  @ApiProperty({ example: CUSTOMER_PHONE })
+  @Matches(/^380\d{9}$/, { message: INVALID_PHONE })
   readonly phone: string;
 
-  @ApiProperty({
-    example: 'Vasilkovskaya 67',
-    description: 'Customer delivery adress',
-  })
+  @ApiProperty({ example: CUSTOMER_ADRESS })
   @IsString()
   @IsNotEmpty()
   readonly adress: string;
 
-  @ApiProperty({
-    example: 590,
-    description: 'Total order price',
-  })
+  @ApiProperty({ example: ORDER_TOTAL_PRICE })
   @IsNumber()
   @IsNotEmpty()
   readonly total_price: number;
 
-  @ApiProperty({
-    example: 'Test',
-    description: 'As Array of orders',
-    type: [Product],
-  })
+  @ApiProperty({ example: Product, type: [Product] })
   @IsArray()
   @ArrayNotEmpty()
-  readonly orders: Array<Product>;
+  @ValidateNested({ each: true })
+  @Type(() => ProductDTO)
+  readonly orders: ProductDTO[];
 }
 
 export class findQuery {
-  @Matches(/^380\d{9}$/, {
-    message: 'The phone number must be 12 digits, without the "+" symbol.',
-  })
+  @Matches(/^380\d{9}$/, { message: INVALID_PHONE })
   @IsNotEmpty()
   readonly phone: string;
 

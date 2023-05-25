@@ -1,7 +1,14 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { Product } from './products.schema';
-import mongoose, { Model } from 'mongoose';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+
 import { InjectModel } from '@nestjs/mongoose';
+
+import { Model } from 'mongoose';
+
+import { Product } from './products.schema';
+
+import { ERROR_MESSAGES } from 'src/helpers/constants/constants';
+
+const { COMPANY_PRODUCTS_NOT_FOUND } = ERROR_MESSAGES;
 
 @Injectable()
 export class ProductsService {
@@ -9,16 +16,16 @@ export class ProductsService {
     @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
-  async getCompanyProducts(companyId: string): Promise<Product[]> {
+  async getCompanyProducts(company_id: string): Promise<Product[]> {
     try {
-      console.log(mongoose.Types.ObjectId.isValid(companyId));
-      const productForCompany = await this.productModel.find({
-        company: companyId,
-      });
+      const productForCompany = await this.productModel.find({ company_id });
+
+      if (productForCompany.length === 0)
+        throw new NotFoundException(COMPANY_PRODUCTS_NOT_FOUND);
 
       return productForCompany;
     } catch (error) {
-      throw new HttpException(error, error.status);
+      throw new HttpException(error.message, error.status);
     }
   }
 }
